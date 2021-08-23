@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div id="app">
+        <h1 align="center">{{msg}}</h1>
+        <table border="1" width="60%">
+            <tr align="center">
+                <th>编号</th>
+                <th>姓名</th>
+                <th>工资</th>
+                <th>日期</th>
+                <th>住址</th>
+                <th>功能</th>
+            </tr>
+            <tr align="center" v-for="item,index in users" :key="index">
+                <td>{{item.id}}</td>
+                <td>{{item.name}}</td>
+                <td>{{item.salary}}</td>
+                <td>{{item.bir}}</td>
+                <td>{{item.home}}</td>
+                <td><a href="javascript:;" @click="dele(item.id)">删除</a> &nbsp;&nbsp; <a href="javascript:;" @click="findOne(item.id)">修改</a> </td>
+            </tr>
+        </table>
+
+        姓名：<input type="text" v-model="user.name"><br>
+        工资：<input type="text" v-model="user.salary"><br>
+        日期：<input type="text" v-model="user.bir"><br>
+        住址：<input type="text" v-model="user.home"><br>
+        姓名：<input type="button" @click="add(user)" value="添加/修改">
+
+        <h1>{{user}}</h1>
+    </div>
+
+</body>
+</html>
+
+<script type="text/javascript" src="js/vue-mini.js"></script>
+<script type="text/javascript" src="js/axios-mini.js"></script>
+<script type="text/javascript">
+    //配置新的axios  可以避免代码重复
+    var vueaxios= axios.create({
+        baseURL:"http://localhost:8989",
+        timeout:5000,
+    });
+
+    //添加拦截器
+    vueaxios.interceptors.response.use(function (response) {
+        return response;
+    }),function (error) {
+        console.log(error);
+    };
+
+    var app= new Vue({
+        el:"#app",
+        data:{
+            msg:"员工管理",
+            users:[],
+            user: {},
+        },
+        methods:{
+
+            findAll(){
+                //var vue_this=this;//vue和this和axios的this不是同一个 需要赋值
+                vueaxios.post("/user/findAll")
+                    .then(response=>this.users=response.data);
+            },
+
+
+            dele(id){
+                //var vue_this=this;
+                vueaxios.post("/user/delete?id="+id)
+                .then(response=>this.findAll());
+                    //console.log("删除成功");
+            },
+
+            add(user){
+                //var vue_this=this;
+                if (this.user.id){  //"" '' null   判断id为空就是添加  不为空就是修改
+                    //修改
+                    vueaxios.post("/user/update",this.user)
+                        .then(response=>{
+                            console.log("修改成功");
+                            this.user={};
+                            this.findAll();
+                        })
+                }else {
+                    //添加
+                    vueaxios.post("/user/add",this.user)
+                        .then(response=>{
+                            console.log(response.data);
+                            console.log("添加成功");
+                            this.user={};
+                            this.findAll();
+                        })
+                }
+            },
+
+            findOne(id){
+                //var vue_this=this
+                vueaxios.post("/user/findOne?id="+id)
+                    .then(response=>this.user=response.data);
+                        //console.log("查一个成功");
+                        //console.log(response.data);
+            }
+        },
+        computed:{
+
+        },
+        created(){
+            this.findAll();
+            /*var vue_this=this;//vue和this和axios的this不是同一个 需要赋值
+            axios.post("http://localhost:8989/user/findAll")
+            .then(function (response) {
+                console.log(response.data);
+                vue_this.users=response.data;
+            })
+            .then(function (error) {
+                console.log(error);
+            })*/
+        }
+    })
+
+</script>

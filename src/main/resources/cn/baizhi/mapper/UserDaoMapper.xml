@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.baizhi.dao.UserDao">
+<!--    List<User> selectAll();-->
+    <select id="selectAll" resultType="User">
+        select id,name,salary,bir,home from user_vue;
+    </select>
+
+<!--    User selectBy(String id);-->
+    <select id="selectBy" resultType="User" parameterType="String">
+        select id,name,salary,bir,home from user_vue where id=#{id};
+    </select>
+
+<!--    void insert(User user);-->
+        <insert id="insert" parameterType="User">
+            insert into user_vue values (#{id},#{name},#{salary},#{bir},#{home});
+        </insert>
+
+<!--    void delete(String id);-->
+        <delete id="delete" parameterType="String">
+            delete  from user_vue where id=#{id};
+        </delete>
+
+<!--    void update(User user);-->
+        <update id="update" parameterType="User">
+            update user_vue set name=#{name},salary=#{salary},bir=#{bir},home=#{home} where id=#{id};
+        </update>
+
+
+
+</mapper>
